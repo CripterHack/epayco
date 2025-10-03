@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true
+  },
+  "references": [
+    {
+      "path": "./packages/shared"
+    },
+    {
+      "path": "./apps/frontend"
+    },
+    {
+      "path": "./services/wallet-api-service"
+    },
+    {
+      "path": "./services/wallet-db-service"
+    }
+  ],
+  "files": [],
+  "include": []
+}
