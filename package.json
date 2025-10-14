@@ -23,8 +23,17 @@
     "*.{ts,tsx,js,json,vue}": [
       "prettier --write"
     ],
-    "*.{ts,tsx,vue}": [
-      "eslint --fix"
+    "services/wallet-db-service/src/**/*.{ts,tsx}": [
+      "pnpm exec eslint --cwd services/wallet-db-service --fix --config .eslintrc.cjs"
+    ],
+    "services/wallet-api-service/src/**/*.{ts,tsx}": [
+      "pnpm exec eslint --cwd services/wallet-api-service --fix --config .eslintrc.cjs"
+    ],
+    "packages/shared/src/**/*.{ts,tsx}": [
+      "pnpm exec eslint --cwd packages/shared --fix --config .eslintrc.cjs"
+    ],
+    "apps/frontend/src/**/*.{ts,tsx,vue}": [
+      "pnpm exec eslint --cwd apps/frontend --fix --config .eslintrc.cjs"
     ]
   }
 }
