@@ -24,16 +24,16 @@
       "prettier --write"
     ],
     "services/wallet-db-service/src/**/*.{ts,tsx}": [
-      "pnpm exec eslint --cwd services/wallet-db-service --fix --config .eslintrc.cjs"
+      "pnpm --dir services/wallet-db-service exec eslint --fix --config .eslintrc.cjs \"src/**/*.{ts,tsx}\""
     ],
     "services/wallet-api-service/src/**/*.{ts,tsx}": [
-      "pnpm exec eslint --cwd services/wallet-api-service --fix --config .eslintrc.cjs"
+      "pnpm --dir services/wallet-api-service exec eslint --fix --config .eslintrc.cjs \"src/**/*.{ts,tsx}\""
     ],
     "packages/shared/src/**/*.{ts,tsx}": [
-      "pnpm exec eslint --cwd packages/shared --fix --config .eslintrc.cjs"
+      "pnpm --dir packages/shared exec eslint --fix --config .eslintrc.cjs \"src/**/*.{ts,tsx}\""
     ],
     "apps/frontend/src/**/*.{ts,tsx,vue}": [
-      "pnpm exec eslint --cwd apps/frontend --fix --config .eslintrc.cjs"
+      "pnpm --dir apps/frontend exec eslint --fix --config .eslintrc.cjs \"src/**/*.{ts,tsx,vue}\""
     ]
   }
 }
