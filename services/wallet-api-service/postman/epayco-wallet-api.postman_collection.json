@@ -1,0 +1,629 @@
+{
+  "info": {
+    "_postman_id": "a20d9a4f-8b15-472c-9d54-7b9a7f27dcb4",
+    "name": "EPayco Wallet API",
+    "description": "Colección completa de Postman para interactuar con la API pública de la billetera EPayco.\n\n## Flujo de uso recomendado:\n1. **Health Check** - Verificar que la API esté funcionando\n2. **Registrar cliente** - Crear un nuevo cliente en el sistema\n3. **Recargar billetera** - Agregar fondos a la billetera del cliente\n4. **Consultar saldo** - Verificar el saldo disponible\n5. **Iniciar pago** - Crear una sesión de pago (se envía token por email)\n6. **Confirmar pago** - Confirmar el pago con el token recibido\n\n## Variables de entorno requeridas:\n- `baseUrl`: URL base de la API (ej: http://localhost:3000/api)\n- `document`: Documento de identidad del cliente\n- `fullName`: Nombre completo del cliente\n- `email`: Email del cliente (para recibir tokens)\n- `phone`: Teléfono del cliente\n- `amount`: Monto para transacciones\n- `sessionId`: ID de sesión (se actualiza automáticamente)\n- `token6`: Token de 6 dígitos (debe obtenerse del email)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has status and timestamp\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('status');",
+              "    pm.expect(jsonData).to.have.property('timestamp');",
+              "    pm.expect(jsonData.status).to.eql('ok');",
+              "});",
+              "",
+              "pm.test(\"Response time is less than 1000ms\", function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "Verifica que la API esté funcionando correctamente. Debe retornar status 'ok' y un timestamp."
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"status\": \"ok\",\n  \"timestamp\": \"2025-10-08T03:25:52.634Z\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Registrar cliente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Response has success structure\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('code');",
+              "    pm.expect(jsonData).to.have.property('message');",
+              "    pm.expect(jsonData).to.have.property('data');",
+              "    pm.expect(jsonData.code).to.eql(0);",
+              "    pm.expect(jsonData.data).to.have.property('customerId');",
+              "});",
+              "",
+              "pm.test(\"Customer ID is a valid UUID\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;",
+              "    pm.expect(jsonData.data.customerId).to.match(uuidRegex);",
+              "    ",
+              "    // Store customer ID for potential future use",
+              "    pm.environment.set('customerId', jsonData.data.customerId);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"document\": \"{{document}}\",\n  \"fullName\": \"{{fullName}}\",\n  \"email\": \"{{email}}\",\n  \"phone\": \"{{phone}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/clients/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["clients", "register"]
+        },
+        "description": "Registra un nuevo cliente en el sistema. Crea automáticamente una billetera asociada.\n\n**Nota:** Si el cliente ya existe, retornará un error. Cada combinación de documento y teléfono debe ser única."
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document\": \"1234567890\",\n  \"fullName\": \"Ada Lovelace\",\n  \"email\": \"ada@example.com\",\n  \"phone\": \"3001234567\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clients/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients", "register"]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": 0,\n  \"message\": \"Customer registered successfully.\",\n  \"data\": {\n    \"customerId\": \"1129edc7-b9a9-4cfc-80f5-6c16749c01aa\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Recargar billetera",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has success structure\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('code');",
+              "    pm.expect(jsonData).to.have.property('message');",
+              "    pm.expect(jsonData).to.have.property('data');",
+              "    pm.expect(jsonData.code).to.eql(0);",
+              "    pm.expect(jsonData.data).to.have.property('balance');",
+              "});",
+              "",
+              "pm.test(\"Balance is a positive number\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data.balance).to.be.a('number');",
+              "    pm.expect(jsonData.data.balance).to.be.above(0);",
+              "    ",
+              "    // Store current balance for future reference",
+              "    pm.environment.set('currentBalance', jsonData.data.balance);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"document\": \"{{document}}\",\n  \"phone\": \"{{phone}}\",\n  \"amount\": {{amount}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/wallet/topup",
+          "host": ["{{baseUrl}}"],
+          "path": ["wallet", "topup"]
+        },
+        "description": "Recarga la billetera del cliente con el monto especificado.\n\n**Validaciones:**\n- El cliente debe existir (documento y teléfono deben coincidir)\n- El monto debe ser positivo\n- El monto se suma al saldo actual"
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document\": \"1234567890\",\n  \"phone\": \"3001234567\",\n  \"amount\": 50000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/wallet/topup",
+              "host": ["{{baseUrl}}"],
+              "path": ["wallet", "topup"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": 0,\n  \"message\": \"Wallet topped up successfully.\",\n  \"data\": {\n    \"balance\": 50000\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Consultar saldo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has success structure\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('code');",
+              "    pm.expect(jsonData).to.have.property('message');",
+              "    pm.expect(jsonData).to.have.property('data');",
+              "    pm.expect(jsonData.code).to.eql(0);",
+              "    pm.expect(jsonData.data).to.have.property('balance');",
+              "});",
+              "",
+              "pm.test(\"Balance is a non-negative number\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data.balance).to.be.a('number');",
+              "    pm.expect(jsonData.data.balance).to.be.at.least(0);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/wallet/balance?document={{document}}&phone={{phone}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["wallet", "balance"],
+          "query": [
+            {
+              "key": "document",
+              "value": "{{document}}"
+            },
+            {
+              "key": "phone",
+              "value": "{{phone}}"
+            }
+          ]
+        },
+        "description": "Consulta el saldo actual de la billetera del cliente.\n\n**Validaciones:**\n- El cliente debe existir (documento y teléfono deben coincidir)\n- Retorna el saldo en la moneda base (pesos colombianos)"
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallet/balance?document=1234567890&phone=3001234567",
+              "host": ["{{baseUrl}}"],
+              "path": ["wallet", "balance"],
+              "query": [
+                {
+                  "key": "document",
+                  "value": "1234567890"
+                },
+                {
+                  "key": "phone",
+                  "value": "3001234567"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": 0,\n  \"message\": \"Balance retrieved successfully.\",\n  \"data\": {\n    \"balance\": 50000\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Iniciar pago",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Response has success structure\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('code');",
+              "    pm.expect(jsonData).to.have.property('message');",
+              "    pm.expect(jsonData).to.have.property('data');",
+              "    pm.expect(jsonData.code).to.eql(0);",
+              "    pm.expect(jsonData.data).to.have.property('sessionId');",
+              "    pm.expect(jsonData.data).to.have.property('expiresAt');",
+              "});",
+              "",
+              "pm.test(\"Session ID is a valid UUID\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;",
+              "    pm.expect(jsonData.data.sessionId).to.match(uuidRegex);",
+              "    ",
+              "    // Store session ID for payment confirmation",
+              "    pm.environment.set('sessionId', jsonData.data.sessionId);",
+              "});",
+              "",
+              "pm.test(\"Expiration date is in the future\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    const expiresAt = new Date(jsonData.data.expiresAt);",
+              "    const now = new Date();",
+              "    pm.expect(expiresAt.getTime()).to.be.above(now.getTime());",
+              "});",
+              "",
+              "console.log('🔔 IMPORTANTE: Se ha enviado un token de 6 dígitos al email del cliente.');",
+              "console.log('📧 Revisa el email para obtener el token antes de confirmar el pago.');",
+              "console.log('⏰ El token expira en 30 minutos.');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"document\": \"{{document}}\",\n  \"phone\": \"{{phone}}\",\n  \"amount\": {{paymentAmount}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/payments/init",
+          "host": ["{{baseUrl}}"],
+          "path": ["payments", "init"]
+        },
+        "description": "Inicia una sesión de pago y envía un token de confirmación de 6 dígitos al email del cliente.\n\n**Proceso:**\n1. Valida que el cliente exista\n2. Verifica que tenga saldo suficiente\n3. Genera un token de 6 dígitos\n4. Envía el token por email\n5. Retorna el ID de sesión y fecha de expiración\n\n**Importante:** El token expira en 30 minutos y debe usarse para confirmar el pago."
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document\": \"1234567890\",\n  \"phone\": \"3001234567\",\n  \"amount\": 10000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/init",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "init"]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": 0,\n  \"message\": \"Sesion de pago generada correctamente.\",\n  \"data\": {\n    \"sessionId\": \"8a71ba13-6a87-4dc1-baa7-90a0fbe77cf3\",\n    \"expiresAt\": \"2025-10-08T04:08:42.339Z\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Confirmar pago",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Verificar que tenemos un sessionId",
+              "if (!pm.environment.get('sessionId')) {",
+              "    console.log('⚠️  ADVERTENCIA: No hay sessionId disponible.');",
+              "    console.log('💡 Ejecuta primero \"Iniciar pago\" para obtener un sessionId válido.');",
+              "}",
+              "",
+              "// Verificar que tenemos un token6",
+              "if (!pm.environment.get('token6')) {",
+              "    console.log('⚠️  ADVERTENCIA: No hay token6 configurado.');",
+              "    console.log('📧 Revisa el email del cliente para obtener el token de 6 dígitos.');",
+              "    console.log('🔧 Actualiza la variable \"token6\" en el entorno con el token recibido.');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 or 401\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 401]);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    pm.test(\"Payment confirmed successfully\", function () {",
+              "        const jsonData = pm.response.json();",
+              "        pm.expect(jsonData).to.have.property('code');",
+              "        pm.expect(jsonData).to.have.property('message');",
+              "        pm.expect(jsonData).to.have.property('data');",
+              "        pm.expect(jsonData.code).to.eql(0);",
+              "        pm.expect(jsonData.data).to.have.property('balance');",
+              "    });",
+              "    ",
+              "    pm.test(\"Balance is updated correctly\", function () {",
+              "        const jsonData = pm.response.json();",
+              "        pm.expect(jsonData.data.balance).to.be.a('number');",
+              "        pm.expect(jsonData.data.balance).to.be.at.least(0);",
+              "        ",
+              "        // Store updated balance",
+              "        pm.environment.set('currentBalance', jsonData.data.balance);",
+              "    });",
+              "    ",
+              "    console.log('✅ Pago confirmado exitosamente');",
+              "} else if (pm.response.code === 401) {",
+              "    pm.test(\"Token validation failed\", function () {",
+              "        const jsonData = pm.response.json();",
+              "        pm.expect(jsonData).to.have.property('code');",
+              "        pm.expect(jsonData).to.have.property('message');",
+              "        pm.expect(jsonData.code).to.be.oneOf([4010, 4011]); // TOKEN_INVALID or TOKEN_EXPIRED",
+              "    });",
+              "    ",
+              "    console.log('❌ Error en la confirmación del pago');",
+              "    console.log('💡 Verifica que el token6 sea correcto y no haya expirado');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sessionId\": \"{{sessionId}}\",\n  \"token6\": \"{{token6}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/payments/confirm",
+          "host": ["{{baseUrl}}"],
+          "path": ["payments", "confirm"]
+        },
+        "description": "Confirma un pago pendiente usando el token de 6 dígitos enviado por email.\n\n**Proceso:**\n1. Valida que la sesión exista y esté pendiente\n2. Verifica que el token no haya expirado\n3. Valida el token de 6 dígitos\n4. Debita el monto de la billetera\n5. Marca la sesión como completada\n\n**Errores comunes:**\n- Token inválido (código 4010)\n- Token expirado (código 4011)\n- Sesión no encontrada (código 1001)\n- Saldo insuficiente (código 2001)"
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"8a71ba13-6a87-4dc1-baa7-90a0fbe77cf3\",\n  \"token6\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/confirm",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "confirm"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": 0,\n  \"message\": \"Pago confirmado exitosamente.\",\n  \"data\": {\n    \"balance\": 40000\n  }\n}"
+        },
+        {
+          "name": "Invalid Token Response",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"8a71ba13-6a87-4dc1-baa7-90a0fbe77cf3\",\n  \"token6\": \"000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/confirm",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "confirm"]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": 4010,\n  \"message\": \"El token proporcionado no es valido.\"\n}"
+        }
+      ]
+    }
+  ]
+}
