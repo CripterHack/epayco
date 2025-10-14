@@ -1,0 +1,12 @@
+{
+  "name": "@epayco/infra",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Infrastructure helpers for the wallet monorepo.",
+  "scripts": {
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:ps": "docker compose ps"
+  }
+}
