@@ -1,0 +1,106 @@
+{
+  "accessibility": {
+    "skipToContent": "Saltar al contenido principal"
+  },
+  "app": {
+    "title": "Billetera Virtual"
+  },
+  "nav": {
+    "register": "Registro",
+    "topUp": "Recarga",
+    "initPayment": "Iniciar pago",
+    "confirmPayment": "Confirmar pago",
+    "balance": "Saldo"
+  },
+  "common": {
+    "underConstruction": "Interfaz en construcción. Próximamente disponible.",
+    "loading": "Procesando...",
+    "allFieldsRequired": "Todos los campos son obligatorios."
+  },
+  "fields": {
+    "document": {
+      "label": "Documento",
+      "placeholder": "Ingresa el número de documento"
+    },
+    "fullName": {
+      "label": "Nombre completo",
+      "placeholder": "Ingresa el nombre completo"
+    },
+    "email": {
+      "label": "Correo electrónico",
+      "placeholder": "Ej. persona@correo.com"
+    },
+    "phone": {
+      "label": "Celular",
+      "placeholder": "Ingresa el número de celular"
+    },
+    "amount": {
+      "label": "Monto",
+      "placeholder": "Ej. 50000"
+    },
+    "sessionId": {
+      "label": "ID de sesión",
+      "placeholder": "Ingresa el ID de sesión recibido"
+    },
+    "token6": {
+      "label": "Token de 6 dígitos",
+      "placeholder": "Ingresa el código de verificación"
+    }
+  },
+  "validation": {
+    "required": "Este campo es obligatorio.",
+    "document": "Ingresa un documento válido (mínimo 6 dígitos).",
+    "fullName": "Ingresa el nombre completo.",
+    "email": "Ingresa un correo válido.",
+    "phone": "Ingresa un celular válido (7 a 15 dígitos).",
+    "amount": "Ingresa un monto mayor a 0.",
+    "token6": "Ingresa un token válido de 6 dígitos.",
+    "sessionId": "Ingresa el ID de sesión recibido."
+  },
+  "register": {
+    "title": "Registrar cliente",
+    "subtitle": "Crea un nuevo cliente para habilitar su billetera.",
+    "helper": "Completa los datos del cliente para habilitar su billetera.",
+    "action": "Registrar cliente",
+    "resultTitle": "Cliente registrado",
+    "resultCustomerId": "ID asignado",
+    "successInstructions": "Comparte el ID con el cliente para futuras operaciones."
+  },
+  "topUp": {
+    "title": "Recargar billetera",
+    "subtitle": "Acredita saldo en la billetera de un cliente.",
+    "helper": "Identifica al cliente y define el valor de la recarga.",
+    "action": "Recargar billetera",
+    "resultTitle": "Saldo actualizado",
+    "resultBalance": "Nuevo saldo disponible",
+    "resultCurrency": "COP"
+  },
+  "paymentInit": {
+    "title": "Iniciar pago",
+    "subtitle": "Genera un token temporal para autorizar una compra.",
+    "helper": "Ingresa los datos del cliente y el monto a cobrar. Se enviará un token de verificación al usuario.",
+    "action": "Generar sesión",
+    "resultTitle": "Sesión generada",
+    "resultSessionId": "ID de sesión",
+    "resultExpiresAt": "Expira",
+    "nextStep": "Ir a confirmar pago"
+  },
+  "paymentConfirm": {
+    "title": "Confirmar pago",
+    "subtitle": "Valida el token y confirma el débito.",
+    "helper": "Usa el ID de sesión y el token de 6 dígitos compartido por el cliente.",
+    "action": "Confirmar pago",
+    "resultTitle": "Pago confirmado",
+    "resultBalance": "Saldo restante",
+    "sessionPrefilled": "ID de sesión precargado desde el paso anterior.",
+    "sessionMissing": "No hay una sesión activa. Genera una nueva antes de confirmar."
+  },
+  "balance": {
+    "title": "Consultar saldo",
+    "subtitle": "Verifica el saldo disponible de la billetera.",
+    "helper": "Consulta el saldo disponible de un cliente en cualquier momento.",
+    "action": "Consultar saldo",
+    "resultTitle": "Saldo disponible",
+    "resultBalance": "Saldo"
+  }
+}
